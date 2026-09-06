@@ -1,0 +1,379 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% Codificacion (pdfLaTeX)
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\DeclareUnicodeCharacter{2212}{−}
+
+% Figuras: tikz/pgfplots deben cargarse ANTES de sus \use...library y \...set
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{patterns,shapes.arrows}
+\pgfplotsset{compat=1.18}
+
+% Tablas, color, enlaces
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+% --- paleta de figuras (validada: CVD dE 9.2 peor par) ---
+\definecolor{vizAzul}{HTML}{2A78D6}
+\definecolor{vizNaranja}{HTML}{EB6834}
+\definecolor{vizAqua}{HTML}{1BAF7A}
+\definecolor{vizAzulClaro}{HTML}{86B6EF}
+\definecolor{vizAzulOscuro}{HTML}{1C5CAB}
+\definecolor{vizRejilla}{HTML}{E1E0D9}
+\definecolor{vizEje}{HTML}{C3C2B7}
+\definecolor{vizMudo}{HTML}{898781}
+\definecolor{vizTinta}{HTML}{52514E}
+
+\ifCLASSOPTIONcompsoc
+\usepackage[nocompress]{cite}
+\else
+\usepackage{cite}
+\fi
+\ifCLASSINFOpdf
+\else
+\fi
+\hyphenation{op-tical net-works semi-conduc-tor BERT-Score}
+\makeatletter
+\newcommand{\linebreakand}{
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\providecommand{\keywords}[1]
+{
+  \small	
+  \textbf{\textit{Keywords---}} #1
+}
+\makeatother
+
+\renewcommand{\thefigure}{\arabic{figure}}
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+
+\title{Location Matters: Predicting PUE, WUE, and Water Scarcity Footprint to Guide Sustainable Data Center Expansion in the U.S.}
+\author{}
+\date{}
+
+\begin{document}
+\author{
+
+\IEEEauthorblockN{ Estefanía Delgado-Castillo}
+\IEEEauthorblockA{\textit{ Instituto Tecnológico de Costa Rica }\\
+Cartago, Costa Rica\\
+tefadc@estudiantec.cr}
+
+\and
+
+\IEEEauthorblockN{..}
+\IEEEauthorblockA{\textit{ Instituto Tecnológico de Costa Rica }\\
+San José, Costa Rica\\
+...@estudiantec.cr}
+
+}
+\maketitle
+
+\begin{center}
+{\large \textbf{Glossary:}}
+\end{center}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Acronym} & \textbf{Meaning} \\
+\midrule
+AI & Artificial Intelligence \\
+AML & Abandoned Mine Lands \\
+ASHRAE & American Society of Heating, Refrigerating and Air-Conditioning Engineers \\
+AWS & Amazon Web Services \\
+AWI & Adjusted Water Impact \\
+CIAO & Intel system, proper name \\
+CO$_2$e & Carbon Dioxide Equivalent \\
+DRL & Deep Reinforcement Learning \\
+EPA & Environmental Protection Agency (U.S.) \\
+eGRID & Emissions \& Generation Resource Integrated Database \\
+GPU & Graphics Processing Unit \\
+GPT & Generative Pre-trained Transformer \\
+H100 & NVIDIA GPU model, proper name \\
+IEA & International Energy Agency \\
+IoT & Internet of Things \\
+LBNL & Lawrence Berkeley National Laboratory \\
+LCOC & Levelized Cost of Cooling \\
+LLM & Large Language Model \\
+MDP & Markov Decision Process \\
+PUE & Power Usage Effectiveness \\
+SAC & Soft Actor-Critic \\
+SCARF & Stress-Corrected Assessment of Water Resource Footprint \\
+SO & Operating System (Sistema Operativo) \\
+TI & Information Technology (Tecnologías de la Información) \\
+TPU & Tensor Processing Unit \\
+TWh & Terawatt-hour \\
+WRI & World Resources Institute \\
+WSF & Water Stress Factor \\
+WUE & Water Usage Effectiveness \\
+WUEoff & Indirect Water Usage Effectiveness (off-site) \\
+WUEon & Direct Water Usage Effectiveness (on-site) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Problem Definition: The AI Crisis}
+
+The rise of Large Language Models (LLMs) and generative artificial intelligence, especially since late 2022, has brought data center energy consumption to a tipping point (Yoo et al., 2026). This paper addresses a problem arising from the emergence of AI: sustainability and energy consumption. The systematic review by Yoo et al. (2026) shows that for nearly a decade, this sector managed to keep its electrical footprint stabilized at around 1–1.5\% of the global total (Masanet et al., 2020, as cited in Yoo et al., 2026); however, this stability has been broken by the growing demand for AI computing, which far exceeds that of conventional workloads (de Vries, 2023, as cited in Yoo et al., 2026). Yoo et al. (2026) also document that data center energy demand could reach approximately 945 TWh by 2030 in the IEA base scenario, comparable to Japan's annual electricity consumption.
+
+This crisis is not only electrical; pressure on water resources is equally alarming. Cooling these high-density servers leaves a substantial water footprint. Li et al. (2025, as cited in Yoo et al., 2026) quantify that training GPT-3 in the U.S. evaporated about 700,000 liters of fresh water on-site (Scope 1), and when indirect water for electricity generation (Scope 2) is included, the figure rises to 5.4 million liters. In daily terms, a routine conversation with ChatGPT (10 to 50 responses) would be equivalent to consuming a 500 mL bottle of water (Li et al., 2025, as cited in Yoo et al., 2026). This trend is not isolated: Barnett-Itzhaki (2026) projects that the global water footprint of AI could reach between 4.2 and 6.6 billion cubic meters annually by 2027, with U.S. data centers consuming up to 280 billion liters annually by 2028 (Shehabi et al., 2024, as cited in Barnett-Itzhaki, 2026). The first truly detailed quantification exercise for the U.S., conducted by Siddik et al. (2021) with 2018 data, estimated a total operational footprint of $5.13 \times 10^8$ m³, of which 3/4 corresponded to indirect consumption from electricity generation. The national average water intensity was 7.1 m³ per MWh consumed, although this average hides extreme territorial variation from 1.8 to 105.9 m³/MWh depending on the local electricity grid mix (Siddik et al., 2021). This variability indicates that the impact is not uniformly distributed but concentrated in specific regions. Indeed, Barnett-Itzhaki (2026) stated that approximately 2/3 of data centers built or planned since 2022 are located in water-stressed regions, including the southwestern U.S., concentrating demand where water is scarcest.
+
+However, these 2018 figures have been far surpassed by recent sector growth; Guidi, Dominici et al. (2024), in an independent study from the Harvard T.H. Chan School of Public Health, compiled detailed data from 2,132 U.S. data centers operating between September 2023 and August 2024, finding electricity consumption of 192.64 TWh (4.59\% of national electricity consumption, more than double the 1.80\% reported for 2018) and emissions of 105.59 million tons of CO$_2$e, more than three times the 31.5 million tons estimated by Siddik et al. for 2018. A particularly relevant finding is that the average carbon intensity of data centers (548 gCO$_2$e/kWh) was 48\% higher than the U.S. national average (369 gCO$_2$e/kWh), suggesting that the geographic location of data centers is not neutral: they tend to concentrate in regions with more carbon-intensive electricity grids, reinforcing the relevance of a location-sensitive predictive model.
+
+The intersection between power density (which raises PUE) and water evaporation (which raises WUE) makes geography the fundamental factor. Patterson et al. (2022, as cited in Yoo et al., 2026) intuited this by including the "Map" (location) factor in their 4M framework, which recognizes that environmental impact depends drastically on where infrastructure is located. Although Yoo et al. (2026) identify Optimal Data Center Siting as a priority research area, their review does not develop integrated predictive models that anticipate the intersection of thermal stress (PUE) and water stress (WUE) in the U.S., which is the main intention of this research. Given that climatic conditions and water availability vary between regions (Mytton, 2021; Farfan \& Lohrmann, 2023), we consider that developing this predictive capability is, more than just a technical improvement, an imperative to avoid the collapse of electrical grids and the depletion of water basins in already stressed areas.
+
+This urgency is reinforced by recent national-scale projections: Xiao et al. (2025), in Nature Sustainability, estimate that the deployment of AI servers in the U.S. could generate between 731 and 1,125 million m³ of annual water footprint and between 24 and 44 million tons of additional CO$_2$-equivalent per year between 2024 and 2030, depending on the expansion scenario. The authors explicitly identify the spatial distribution of servers as one of the factors that introduces the most uncertainty into these projections, and show that concentrating installation in Midwestern states (Texas, Montana, Nebraska, South Dakota), with high renewable potential and low water scarcity, could reduce emissions by up to 73\% and water footprint by 86\% compared to inertial expansion; this confirms that location is not a secondary factor but the central determinant of a data center's sustainability, validating the relevance of a predictive model for PUE, WUE, and WSF by location.
+
+\section{Diagnosis of the Ecological Footprint in the U.S.}
+
+Accurate quantification of the ecological footprint of AI in the United States faces multiple limitations. Available data mostly come from indirect estimates, extrapolations from published computing budgets, or point measurements in specific configurations (Yoo et al., 2026). There is no mandatory reporting standard for energy and water for data center operators, and heterogeneity in hardware architectures, cooling efficiencies, and carbon intensities of local grids hinders any meaningful aggregation (Shehabi et al., 2024, as cited in Yoo et al., 2026). This unfortunately prevents determining the true aggregate impact with certainty and, worse, its spatial distribution.
+
+This difficulty responds to a structural corporate transparency gap. As Halgamuge \& Srinivasa (2026) point out, the main global model developers withhold energy consumption and emissions data for reasons of market competition. The GPT-4 technical report, for example, does not reveal data on its architecture, computation, or associated emissions, and Anthropic adopts a similar stance with its Claude model family (Halgamuge \& Srinivasa, 2026). In contrast, Meta AI has shown that detailed reporting is viable: when launching LLaMA in 2023, the company voluntarily reported that the development of its model family consumed 2.6 million kWh and generated approximately 1015 tCO$_2$e, including experimentation and failed testing phases (Halgamuge \& Srinivasa, 2026).
+
+Furthermore, the review by Yoo et al. (2026) shows that inference will dominate aggregate energy demand in the long term as generative AI is deployed at scale. This phenomenon of "inference scaling" (aggravated by the emergence of reasoning models (chain-of-thought) and agentic systems that make multiple sequential calls) implies that predicting data center energy consumption requires models that capture both deployment dynamics and hardware efficiency and cooling strategies (Yoo et al., 2026).
+
+(Hankendi et al., 2026)
+
+It is true that these tools and their recent emergence have helped the industry; it is clear that they have boosted various industries and services, providing a wide range of benefits, but the carbon and energy footprints are not trivial — in the graph above one can appreciate their life cycle.
+
+(Jiang et al., 2026)
+
+Nevertheless, and despite this initially adverse diagnosis, there is evidence that AI itself could contribute to mitigating its ecological footprint as its systemic adoption matures. Melguizo et al. (2026) empirically demonstrate that the relationship between AI spending and environmental impact is not linear but follows a green Kuznets curve: in the initial phases of adoption, technological spending is mostly directed to training foundational models, which increases net electricity consumption and emissions; however, once a critical market maturity threshold is surpassed, the curve reverses and AI begins to generate a technological efficiency dividend. This dividend is observed in the optimization of smart electrical grids, improved prediction of variability in solar and wind generation, the introduction of dynamic cooling efficiencies through reinforcement learning algorithms, and the decarbonization of intensive industrial sectors. Currently, only leading nations like the United States and Singapore have begun to cross these thresholds (Melguizo et al., 2026). This suggests that AI is not only a problem to be solved but potentially contains the tools for its own solution, and that predictive models of PUE, WUE, and WSF by location may be key to accelerating the arrival of this technological dividend to more geographic regions.
+
+\section{Ideas for Supporting Sustainability}
+
+Addressing alternatives is not new; data center sustainability has been studied and there are several methods to evaluate it, taking various criteria into account. For example, to estimate the footprint left by a data center, various metrics are considered. The construction footprint is calculated, including materials used, machinery, land leveling or modifications. The manufacturing footprint of technological components — computers, servers, and other technology components — is also taken into account. The transportation footprint — movement of equipment, materials, personnel — is also considered, additionally considering the transportation method, for example, whether equipment is transported by truck, air, or ship (this is considered despite data showing that data center operations generate a much larger carbon footprint than transportation) (Hankendi et al., 2026).
+
+Jiang et al. (2024) explain that projections for state-of-the-art models (GPT-4, Gemini) suggest training emissions on the order of thousands of tons of CO$_2$e, although the absence of official data prevents precise quantification. Furthermore, they emphasize that manufacturing state-of-the-art GPUs and TPUs generates emissions that, in decarbonized electricity grids, can represent up to 50\% of the total life-cycle footprint, and the rapid hardware renewal cycle (2–3 years) generates growing volumes of electronic waste.
+
+(Hankendi et al., 2026)
+
+To conclude with certain metrics used to measure the carbon footprint and move on to covering techniques that have been developed to try to reduce the impact, this table is briefly discussed. Here, for example, there are some servers and their characteristics. The footprint at manufacturing, transportation, and end-of-life stages is considered — for example, when equipment is disposed of, returned to the company from which it was leased, or scrapped.
+
+Various technologies and ideas have been developed. In a survey by Zakarya et al., several ideas are proposed to reduce the footprint, and it explains how there are numerous projects both to explain and to explore energy efficiency. There are various virtualization options and container usage. The following graph clarifies the difference between them.
+
+(Zakarya et al., 2026)
+
+They are not limited to providing virtual environments in this Infrastructure-as-a-Service environment; they even offer "bare metal," selling the computer without any containers or anything, leaving virtualization to the client. There are different types of virtualization: full, paravirtualization, or OS-level. Each with different properties, and then there are techniques that combine them or instead of using virtual machines they use containers; the latter have become popular despite their ease of deployment, they may have lower energy efficiency, while optimal performance is sought. A solution to this is a hybrid system, Intel's system called CIAO, which shows promise for performance and energy efficiency, through a controller, scheduler, and launcher. Later, in the market, technologies have arrived such as the configurations recommended by ASHRAE, which can reduce consumption equivalent to approximately 2,500 homes in terms of electricity (Xiao \& You, 2025). These standards are followed, but this demonstrates how even configurations can make a big difference, and that there are indeed alternatives and not just letting pollution continue.
+
+\section{Evolution of Metrics and Spatio-Temporal Adjustment Methodologies}
+
+The evaluation of data center environmental performance has transitioned from purely energy indicators to integrated frameworks that consider water and local water scarcity. PUE (Power Usage Effectiveness), defined as the ratio of total energy supplied to the data center to the energy consumed exclusively by IT equipment (Siddik et al., 2021), has been the industry standard for over a decade. A PUE of 1.0 represents the theoretical ideal; hyperscale centers have achieved quarterly values as low as 1.07 (Gao, 2014), although most installations range between 1.1 and 2.0 depending on size and cooling strategies. The classic PUE formula, documented by Siddik et al. (2021), relates total power supplied to power consumed by IT equipment, and has been essential for driving energy efficiency.
+
+However, the rise of AI has brought water metrics to the forefront. WUE (Water Usage Effectiveness) is defined as the annual volume of water used for cooling and humidification divided by annual IT energy consumption (liters/kWh or m³/MWh) (Higgins, 2024, as cited in Barnett-Itzhaki, 2026). Barnett-Itzhaki (2026) provides a comparative table illustrating the enormous variability of WUE according to cooling technology: while evaporative systems can exceed 3.0 L/kWh (consuming ~25,500 m³ annually per MW of IT), installations with free air cooling in cold climates (e.g., Meta in Luleå) achieve WUE below 0.3 L/kWh, and submarine or waterless systems achieve zero on-site WUE. Nevertheless, WUE has critical limitations: corporate reports often aggregate global data and confuse withdrawal with consumptive use, preventing meaningful comparisons between installations (Barnett-Itzhaki, 2026).
+
+\subsection{Formalization of the SCARF Model}
+
+To resolve the limitation of conventional WUE and capture the spatial and temporal variability of water stress, Wu et al. (2025) propose the SCARF (Stress-Corrected Assessment of Water Resource Footprint) framework, which breaks down the data center water balance into two fundamental operational scopes:
+
+\textbf{Direct or On-Site Water Consumption (Scope 1):} This is the water physically evaporated in the facility's cooling towers. It is calculated using server power, operating time, and the plant's direct water efficiency (Wu et al., 2025):
+
+\begin{equation}
+W_{\text{on}} = P \cdot t \cdot WUE_{\text{on}}
+\end{equation}
+
+\textbf{Indirect or Off-Site Water Consumption (Scope 2):} This is the water footprint associated with the generation of the electricity consumed by the plant on the regional electricity grid. It is directly influenced by the data center's PUE and the water intensity of the local electricity generation mix ($WUE_{\text{off}}$) (Wu et al., 2025):
+
+\begin{equation}
+W_{\text{off}} = P \cdot t \cdot PUE \cdot WUE_{\text{off}}
+\end{equation}
+
+Once the total gross volume ($W_{\text{on}} + W_{\text{off}}$) is modeled, the SCARF framework calculates the Adjusted Water Impact (AWI) by multiplying that volume by the Water Stress Factor (WSF) of the global watershed where the facility is located (Wu et al., 2025):
+
+\begin{equation}
+AWI = (W_{\text{on}} + W_{\text{off}}) \times WSF_b
+\end{equation}
+
+Code available at \url{https://github.com/jojacola/SCARF}.
+
+This spatial and temporal adjustment is essential since water availability varies dynamically month by month. When analyzing data center locations in the U.S., Wu et al. (2025) demonstrate that regions like Arizona (AZ) and Wyoming (WY) experience severe seasonal drought peaks between April and June, causing the real impact (AWI) of a computing load in Arizona to double compared to winter periods. This shows that predicting PUE and WUE without considering temporal fluctuations in local scarcity completely distorts the sustainability diagnosis (Wu et al., 2025).
+
+Additionally, Wu et al. (2025) propose two temporal horizons for the Water Stress Factor:
+
+\begin{itemize}
+\item \textbf{Short-term WSF} (for flexible workloads like LLM inference): uses the base year water stress without temporal discount.
+\item \textbf{Long-term WSF} (for infrastructure like data centers operating for decades): aggregates future projections (2030, 2050, 2080) with a discount rate $\gamma$ that reflects intergenerational weighting. The choice of $\gamma$ significantly alters the sustainability ranking among locations: with a low discount rate (prioritizing future generations' well-being), Nevada appears more sustainable than Virginia; however, when increasing the rate to prioritize the short term, the ranking is inverted (Wu et al., 2025).
+\end{itemize}
+
+This predictive estimation should be coupled with a rigorous uncertainty analysis. As demonstrated by the Monte Carlo simulations of Halgamuge \& Srinivasa (2026), when estimating the indirect ecological footprint of computing, the range of variation of the local electricity grid emission factor is the variable that absolutely dominates the uncertainty of the results (registering a relative half-width $R \approx 0.33$ for location accounting and $R \approx 0.77$ for market). The PUE design range has a moderate impact, and instrumental measurement errors and device-draw variations represent secondary factors (Halgamuge \& Srinivasa, 2026).
+
+\section{Previously Proposed Alternatives}
+
+With all this documented and defined, what has been done and/or proposed to help with the footprint generated by data centers? Various optimization tools have been implemented, seeking to reduce resource usage and increase performance. Thinking about how to address this issue is already something that technology communities have set as a topic of thought and concern. In several places, attempts have been made to evaluate the energy consumption of companies with their data centers. For example, Facebook used 7.17 TWh of energy in 2020, but of that, more than 90\% went to its data centers (Facebook, cited in Zakarya et al., 2024). This has been going on for a long time; data centers have existed for a while, not necessarily for AI, but to provide services, servers, video streaming, among others. This is a business and environmental impact issue, as companies need their servers running optimally, whether to maintain business, or simply because according to financial projections (Zakarya et al., 2024), something like a half-second delay on Google results in financial losses.
+
+Even in more recent times, with the rapid evolution of LLMs and how they have affected how data centers are used and the number built massively. One technique, for example, is the digital twin. This technique is being used to confront this problem directly, where traditional monitoring systems are based on reactive strategies (Hsieh et al., 2026). This is where problems arise, not only because training LLMs is a volatile process that requires more proactive approaches. Energy can be forecast and simulated using telemetry from the current structure to create a simulation. Hsieh et al. (2026) propose building a digital model of the data center's physical infrastructure using telemetry from the current structure, including temperature data, server energy consumption (GPU H100), cooling efficiency, and workload profiles, to then simulate future energy demand scenarios using federated learning algorithms that allow training predictive models without compromising the operational data privacy of each center.
+
+AI is not the cause of data centers' existence; they existed before AI, but recent advances have clearly led to more data centers being built, and AI itself requires many GPUs and its servers consume a lot of energy. "Large-scale AI data centers also pose additional water sustainability risks, as cooling demands intensify in high-temperature, water-scarce regions with higher water usage effectiveness" (Xiao \& You, 2025). Analyzing these potential conflicts when working with data centers is a real problem, not only attempting to use renewable energy or even optimizing cooling methods. One technology mentioned in the paper by Xiao \& You (2025) is DRL, which stands for "Deep Reinforcement Learning," quoting the same text: "DRL is a sophisticated decision-making approach grounded in the Markov Decision Process (MDP). In this study, the Soft Actor-Critic (SAC) approach is used to train DRL controllers for AI data centers. SAC is selected considering its stability in manipulating dynamically controlled variables and reliable performance without a timely hyperparameter tuning process." (Xiao \& You, 2025). Thus, DRL is a useful tool, designed to make decisions based on various factors such as current state, history of states, rewards, and other aspects to manipulate temperatures, energy, among others, to be efficient with electricity and temperatures. What sets it apart from existing controllers is its ability to have different strategies and act better in any given situation.
+
+The specialized literature has documented a wide range of technical solutions that go beyond software optimization. Barnett-Itzhaki (2026) conducts an exhaustive review of alternative cooling technologies, highlighting specific cases: Meta's center in Luleå (Sweden) takes advantage of the Arctic climate for free air cooling, consuming only 25.4 million liters annually (compared to ~25,500 m³ per MW consumed by a typical evaporative system); Google in Hamina (Finland) and Alibaba at Qiandao Lake use sea or lake water as a heat sink through closed-loop heat exchangers, achieving WUE below 0.2; China already operates commercial submarine centers with zero freshwater consumption; and companies like ZutaCore or Deep Green offer waterless systems (immersion cooling or dry rejection) that eliminate on-site consumption, although they increase electricity consumption by 10 to 25\%. Furthermore, the use of non-potable or recycled water is growing: AWS operates reclaimed water systems in 20 facilities, and Google uses non-potable water in over 25\% of its campuses (Barnett-Itzhaki, 2026).
+
+However, Barnett-Itzhaki (2026) warns that each solution presents trade-offs that complicate widespread implementation. There is a financial-environmental trade-off: water is economically undervalued in most jurisdictions, incentivizing operators to choose evaporative cooling (cheap but water-intensive) over more expensive dry alternatives. There is also an energy-water trade-off: dry cooling reduces water consumption but increases electricity demand and associated carbon emissions, while evaporative cooling is energy-efficient but consumes water. Finally, a regional trade-off exists: regions with high solar irradiation (ideal for solar energy) tend to be arid and water-scarce, while Nordic regions with abundant water and cold climates have limited solar resources and partially depend on hydroelectric power, whose reservoir evaporation represents its own water footprint.
+
+At the territorial planning level, Siddik et al. (2021) demonstrated through scenario simulations that the strategic location of new servers can drastically reduce environmental impact. Placing new data centers in sub-basins with the best environmental performance (upper quartile in WSF and carbon footprint) would achieve potential reductions of 90\% in WSF and 55\% in carbon emissions compared to inertial expansion. However, less than 5\% of U.S. sub-basins are optimal for both indicators simultaneously, forcing trade-off decisions between water and climate objectives. This reinforces the need for predictive tools that allow evaluating these trade-offs before construction.
+
+A promising alternative that recently emerged is the repurposing of Abandoned Mine Lands (AML) for data center location and cooling. He et al. (2026) develop a heat transfer model that quantifies the cooling capacity of lakes formed in abandoned surface mine pits (pools). These water bodies, fed by groundwater infiltration, remain stably cold throughout the year, making them an ideal source for free cooling systems. Applying their model to the Morea mine case in eastern Pennsylvania, He et al. (2026) demonstrate that the 100,000 m² surface pool can reliably support thermal loads of at least 9.5 MW with conventional air cooling systems, and up to 30.6 MW with liquid cooling technologies, under adverse climatic conditions. Furthermore, they identify 160 abandoned mine lands in Pennsylvania with pool areas sufficient for data center applications. This strategy not only provides a low-cost, low-water-consumption cooling solution (the estimated LCOC is only \$1.085/MWh, comparable to natural cold water), but also accelerates the environmental remediation of these legacy sites, converting environmental liabilities into assets for the digital economy (He et al., 2026).
+
+Finally, beyond technology, Barnett-Itzhaki (2026) introduces the concept of "digital water sobriety" as a governance framework that challenges the assumption that AI expansion should proceed without considering water constraints. This framework advocates for evaluating which AI applications justify their water cost, regulating infrastructure location (avoiding severe stress regions), and requiring mandatory facility-level transparency reports, including standardized WUE metrics. Documented conflict cases, such as Colón (Mexico), where a Microsoft installation competes for water with agricultural communities during a severe drought, exemplify the urgency of this governance (Barnett-Itzhaki, 2026).
+
+Data centers are important for many countries' economies and, clearly, essential for AI development. But that does not mean the resources they consume for operation can be neglected. As Hankendi et al. (2026) state: "Currently, about 3\% of global electricity is consumed by data centers, which is expected to increase due to escalating demand for emerging technologies, such as artificial intelligence, the internet of things, and cryptocurrency mining." The impacts of data centers have become noticeable, not only environmentally; recent demand has raised energy costs for average consumers. This is just one of the effects that have become apparent since data center demand increased. The strongest effects on the population have been in the United States, not only due to energy consumption but also the inconvenience caused to residents living near these data centers; common complaints have been noise and water impact, as consuming so much water lowers pressure and also pollutes the water.
+
+\section{Dataset Construction}
+
+\begin{itemize}
+\item \textbf{Data Center Coordinates:} Identify the precise geographic location of data centers from major providers (Google, Microsoft, AWS, Meta) in the U.S., cross-referenced with the World Resources Institute (WRI) Aqueduct 4.0 API to obtain the global watershed ID and its seasonal WSF (Wu et al., 2025).
+
+\item \textbf{Local Climatic Variables:} Historical data on wet-bulb and dry-bulb temperature, relative humidity, and wind speed to predict evaporation rate and direct WUE, using correlations documented in the literature (Barnett-Itzhaki, 2026).
+
+\item \textbf{Electricity Grid Mapping (PCA):} Local electricity generation mix for each U.S. state (EPA eGRID) to calculate indirect WUE ($WUE_{\text{off}}$), the water intensity of the regional electricity generation mix, and carbon emission factors (Siddik et al., 2021).
+
+\item \textbf{Workload and Energy Consumption Data:} Estimate server energy consumption based on the number and type of accelerators (GPUs/TPUs: H100, A100, TPU v4), operating time (annual training and inference hours), and load profiles (differentiating between training loads - batch, flexible - and inference - latency-sensitive, non-flexible), applying SCARF equations for total energy calculation (Wu et al., 2025).
+
+\item \textbf{Integration of Projection Scenarios:} Use energy demand projections from the IEA (945 TWh in 2030, 1200 TWh in 2035) and LBNL (325–580 TWh in 2028 for the U.S.) to scale results to the aggregate level and validate the model's geographic coverage (Yoo et al., 2026; Shehabi et al., 2024).
+
+\item \textbf{Identification of Abandoned Mine Lands (AML):} To evaluate the feasibility of locating data centers on these sites, identify AMLs with surface lakes (pools) in the U.S., particularly in Pennsylvania, using data from the Pennsylvania Department of Environmental Protection and the National Hydrography Dataset. Calculate pool area (>0.01 km² is the minimum threshold identified by He et al., 2026) and local wind speed (recommended minimum threshold of 0.7 m/s for the 5th percentile of daily wind speed) to ensure sufficient cooling capacity.
+\end{itemize}
+
+\section*{References}
+
+\begin{thebibliography}{99}
+
+\bibitem{Barnett2026}
+Barnett-Itzhaki, Z. (2026). The water footprint of artificial intelligence: Emerging solutions and governance imperatives. \textit{Water Research}, 299, 125866. \url{https://doi.org/10.1016/j.watres.2026.125866}
+
+\bibitem{Hsieh2026}
+Hsieh, Y., Lin, C., \& Su, M. (2026). Digital Twin-Driven Power Demand Forecasting for Sustainable Data Centers via Federated Learning on H100 GPU Clusters. \textit{Communications in Computer and Information Science}, 3-11. \url{https://doi.org/10.1007/978-981-92-1546-1_1}
+
+\bibitem{He2026}
+He, Z., Smith, T. W., Lei, Z., \& Dahi Taleghani, A. (2026). Repurposing abandoned mine lands for cooling data centers. \textit{Resources, Conservation and Recycling}, 225, 108640. \url{https://doi.org/10.1016/j.resconrec.2025.108640}
+
+\bibitem{Zakarya2024}
+Zakarya, M., Khan, A. A., Qazani, M. R. C., Ali, H., Al-Bahri, M., Khan, A. U. R., Ali, A., \& Khan, R. (2024). Sustainable computing across datacenters: A review of enabling models and techniques. \textit{Computer Science Review}, 52, 100620. \url{https://doi.org/10.1016/j.cosrev.2024.100620}
+
+\bibitem{Halgamuge2026}
+Halgamuge, M. N., \& Srinivasa, N. (2026). Emissions transparency in AI research should be mandatory. \textit{Sustainable Computing: Informatics and Systems}, 50, 101313. \url{https://doi.org/10.1016/j.suscom.2026.101313}
+
+\bibitem{Hankendi2026}
+Hankendi, C., Coskun, A. K., \& Sovacool, B. K. (2026). Beyond the carbon emissions of Artificial Intelligence (AI): A whole-systems energy and environmental sustainability analysis of datacenters in Denmark, Germany and Norway. \textit{Energy Research \& Social Science}, 138, 104839. \url{https://doi.org/10.1016/j.erss.2026.104839}
+
+\bibitem{DeVries2025}
+De Vries-Gao, A. (2025). The carbon and water footprints of data centers and what this could mean for artificial intelligence. \textit{Patterns}, 7(1), 101430. \url{https://doi.org/10.1016/j.patter.2025.101430}
+
+\bibitem{Jiang2024}
+Jiang, P., Sonne, C., Li, W., You, F., \& You, S. (2024). Preventing the Immense Increase in the Life-Cycle Energy and Carbon Footprints of LLM-Powered Intelligent Chatbots. \textit{Engineering}, 40, 202-210. \url{https://doi.org/10.1016/j.eng.2024.04.002}
+
+\bibitem{Melguizo2026}
+Melguizo, A., Katz, R., \& Jung, J. (2026). Can AI grow green? Evidence of a Kuznets curve among AI, renewable energies and emissions. \textit{Energy Policy}, 189, 114456. \url{https://doi.org/10.1016/j.enpol.2025.114883}
+
+\bibitem{Xiao2025}
+Xiao, T., \& You, F. (2025). Leveraging Deep Reinforcement Learning within Optimal Renewable Energy Strategies for Sustainable AI Data Centers. \textit{Environmental Science \& Technology}, 60(1), 522-536. \url{https://doi.org/10.1021/acs.est.5c09990}
+
+\bibitem{Schmitt2024}
+Schmitt, M. (2024). Sustainable Machine Learning: Evaluating the environmental cost of AutoML algorithms in AI development. \textit{Proceedings - 2024 IEEE Conference on Artificial Intelligence, CAI 2024}, 1371-1372. \url{https://doi.org/10.1109/cai59869.2024.00244}
+
+\bibitem{Siddik2021}
+Siddik, M. A. B., Shehabi, A., \& Marston, L. (2021). The environmental footprint of data centers in the United States. \textit{Environmental Research Letters}, 16(6), 064017. \url{https://doi.org/10.1088/1748-9326/abfba1}
+
+\bibitem{Wu2025}
+Wu, Y., Hua, I., \& Ding, Y. (2025). Not All Water Consumption Is Equal: A Water Stress Weighted Metric for Sustainable Computing. \textit{Proceedings of the ACM on Measurement and Analysis of Computing Systems}, 9(2), 1-28. \url{https://doi.org/10.1145/3757892.3757904}
+
+\bibitem{Yoo2026}
+Yoo, S., Choi, S., \& Kim, D. (2026). Can renewable energy meet the surging power demand of artificial intelligence? A systematic review. \textit{Renewable and Sustainable Energy Reviews}, 188, 114456. \url{https://doi.org/10.1016/j.rser.2026.117213}
+
+\end{thebibliography}
+
+\end{document}
+
+\begin{comment}
+\begin{document}
+\title{PUE and WUE predictions by location for datacenters in the US}
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+
+\author{
+
+\IEEEauthorblockN{ Estefanía Delgado-Castillo}
+\IEEEauthorblockA{\textit{ Instituto Tecnológico de Costa Rica }\\
+Cartago, Costa Rica\\
+tefadc@estudiantec.cr}
+
+\and
+
+\IEEEauthorblockN{..}
+\IEEEauthorblockA{\textit{ Instituto Tecnológico de Costa Rica }\\
+San José, Costa Rica\\
+...@estudiantec.cr}
+
+}
+
+\maketitle
+
+\begin{abstract}
+...
+\end{abstract}
+
+
+\keywords{eee, eee, eee}
+
+
+\section{Introduction}
+este articulo dadadadada
+
+\section{Problem Definition}
+dadadadad proposed by \cite{ejemplo}
+
+\subsection{xx}
+\label{xx}
+dadadada
+
+
+\subsubsection{The evaluation data}
+\label{sec:generator}
+\begin{table}[t]
+\centering
+\caption{this table \% is about lalala}
+\label{tab:diag}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{llrrrr}
+\toprule
+
+lala & alala & lala & lala & lala \\
+...$\times$ \\
+\midrule
+..$\times$ \\
+...$\times$ \\
+
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Conclusions}
+
+% Referencias
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}
+
+\end{comment}
