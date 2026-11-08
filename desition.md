@@ -1,7 +1,5 @@
 # Decisiones técnicas — Etapa 2
 
-Proyecto: Location Matters (IA, TEC, Track A). Cada decisión crítica lleva su alternativa descartada y la evidencia que la respalda.
-
 ## A. Datos y partición
 
 | # | Decisión | Elegimos | Alternativa descartada | Por qué (evidencia) |
