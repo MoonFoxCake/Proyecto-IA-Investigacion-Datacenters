@@ -1,0 +1,2 @@
+
+Inteligencia artificial generativa fue utilizada en la investigación del proyecto y la generación de código, asistiendo en el desarrollo del mismo, pero se mantuvo el criterio humano sobre cómo manejar los datasets, cómo dividir los datos y qué pasos hacer en todo momento. También se interpretaron los resultados manualmente, por lo que se mantuvo la IA como una herramienta asistente.
